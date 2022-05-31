@@ -17,7 +17,7 @@ import { CategoryPriorityPayload } from '../../shared/payloads';
 import { ApiResponse } from '../../shared/types';
 import { CategoryPrioritiesService } from '../services';
 
-@Controller('category-priorities')
+@Controller({ path: 'category-priorities', version: '1' })
 export class CategoryPrioritiesController {
   constructor(
     private readonly authService: AuthService,

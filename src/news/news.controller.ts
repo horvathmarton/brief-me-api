@@ -13,7 +13,7 @@ import { Article } from 'src/shared/payloads/article.response';
 import { ApiResponse } from '../shared/types';
 import { NewsService, TtsService } from './services';
 
-@Controller('news')
+@Controller({ path: 'news', version: '1' })
 export class NewsController {
   private readonly CHANNELS = [
     new Channel({

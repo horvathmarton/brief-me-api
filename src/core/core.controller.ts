@@ -1,9 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 import { ApiResponse } from 'src/shared/types';
 import { Role } from '../auth/roles';
 import * as packageInfo from '../../package.json';
 
-@Controller()
+@Controller({ version: VERSION_NEUTRAL })
 export class CoreController {
   @Get()
   @Role('anonymous')

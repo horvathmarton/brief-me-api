@@ -13,7 +13,7 @@ import { ApiResponse } from '../shared/types';
 import { AuthService } from './auth.service';
 import { Role } from './roles/roles.decorator';
 
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(private authService: AuthService) {}
 

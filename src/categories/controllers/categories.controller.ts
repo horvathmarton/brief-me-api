@@ -4,7 +4,7 @@ import { ApiResponse } from 'src/shared/types';
 import { Role } from '../../auth/roles';
 import { CategoriesService } from '../services';
 
-@Controller('categories')
+@Controller({ path: 'categories', version: '1' })
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
