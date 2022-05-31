@@ -8,18 +8,16 @@ import * as models from './models';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          type: 'postgres',
-          host: configService.get('DATABASE_HOST'),
-          port: +configService.get<number>('DATABASE_PORT'),
-          database: configService.get('DATABASE_NAME'),
-          username: configService.get('DATABASE_USER'),
-          password: configService.get('DATABASE_PASSWORD'),
-          synchronize: true,
-          entities: [...Object.values(models)],
-        };
-      },
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get('DATABASE_URL'),
+        synchronize: true,
+        entities: [...Object.values(models)],
+        ssl:
+          process.env.NODE_ENV === 'local'
+            ? false
+            : { rejectUnauthorized: false },
+      }),
     }),
   ],
 })

@@ -1,0 +1,19 @@
+{
+  "name": "Brief me",
+  "repository": "https://github.com/horvathmarton/brief-me-api",
+  "scripts": {
+    "predeploy": "npm install && npm run build"
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "image": "heroku/nodejs",
+  "addons": ["heroku-postgresql"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}

@@ -8,6 +8,6 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
-  await app.listen(3000);
+  await app.listen(Number.parseInt(process.env.PORT), '0.0.0.0');
 }
 bootstrap();
