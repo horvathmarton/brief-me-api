@@ -1,14 +1,9 @@
-import {
-  Controller,
-  Get,
-  NotImplementedException,
-  Param,
-  StreamableFile,
-} from '@nestjs/common';
+import { Controller, Get, Param, StreamableFile } from '@nestjs/common';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import { Role } from 'src/auth/roles';
 import { ApiResponse } from '../shared/types';
+import { Article, Channel } from './interfaces';
 import { NewsService, TtsService } from './services';
 
 @Controller('news')
@@ -20,7 +15,7 @@ export class NewsController {
 
   @Get('channels')
   @Role('user')
-  public listChannels(): ApiResponse<unknown> {
+  public listChannels(): ApiResponse<Channel[]> {
     const CHANNELS = [
       { id: 1, title: 'For me' },
       { id: 2, title: 'About the war' },
@@ -28,7 +23,7 @@ export class NewsController {
       { id: 4, title: 'Celebrity news' },
     ];
 
-    return { payload: { channels: CHANNELS } };
+    return { payload: CHANNELS };
   }
 
   @Get('channels/:channelId')
@@ -48,7 +43,7 @@ export class NewsController {
   @Role('user')
   public async fetchChannelText(
     @Param('channelId') channelId: number,
-  ): Promise<ApiResponse<unknown>> {
+  ): Promise<ApiResponse<Article[]>> {
     const news = await this.newsService.list(channelId);
 
     return { payload: news };

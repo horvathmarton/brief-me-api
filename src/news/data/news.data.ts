@@ -1,5 +1,7 @@
+import { Article } from '../interfaces';
+
 // TODO: Remove me!
-export const NEWS: Record<number, unknown[]> = {
+export const NEWS: Record<number, Article[]> = {
   1: [
     {
       title:

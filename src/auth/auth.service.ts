@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { sign, verify } from 'jsonwebtoken';
 
@@ -9,18 +13,23 @@ interface Token {
 
 @Injectable()
 export class AuthService {
-  // TODO: Read me from env!
-  private readonly JWT_SECRET = 'my-secret';
+  constructor() {
+    const { JWT_SECRET, JWT_EXPIRATION_MINUTES } = process.env;
+
+    if (!JWT_SECRET || !JWT_EXPIRATION_MINUTES) {
+      throw new InternalServerErrorException('JWT if not configured properly.');
+    }
+  }
 
   public createToken(username: string, isAdmin: boolean): string {
-    return sign({ username, isAdmin }, this.JWT_SECRET, {
-      expiresIn: '10 minutes',
+    return sign({ username, isAdmin }, process.env.JWT_SECRET, {
+      expiresIn: `${process.env.JWT_EXPIRATION_MINUTES} minutes`,
     });
   }
 
   public decodeToken(token: string): Token {
     try {
-      return verify(token, this.JWT_SECRET) as Token;
+      return verify(token, process.env.JWT_SECRET) as Token;
     } catch (error) {
       throw new UnauthorizedException('JWT token is invalid.');
     }

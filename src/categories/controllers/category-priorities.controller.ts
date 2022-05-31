@@ -9,6 +9,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
+import { CategoryPriority } from 'src/db/models';
 import { AuthService } from '../../auth/auth.service';
 import { Role } from '../../auth/roles';
 import { CategoryPriorityPayload } from '../../shared/payloads';
@@ -28,7 +29,7 @@ export class CategoryPrioritiesController {
     @Req() request: Request,
     @Param('categoryName') categoryName: string,
     @Body() payload: CategoryPriorityPayload,
-  ): Promise<ApiResponse<unknown>> {
+  ): Promise<ApiResponse<CategoryPriority>> {
     const { priority } = payload;
     const token = this.authService.parseToken(request);
     const { username } = this.authService.decodeToken(token);
@@ -56,7 +57,7 @@ export class CategoryPrioritiesController {
   }
 
   @Get('export')
-  @Role('user')
+  @Role('admin')
   public async exportCategoryPrioritiesMatrix(): Promise<void> {
     const csv = await this.categoryPrioritiesService.export();
 

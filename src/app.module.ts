@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth';
 import { RolesGuard } from './auth/roles';
@@ -8,7 +9,14 @@ import { DbModule } from './db';
 import { NewsModule } from './news';
 
 @Module({
-  imports: [AuthModule, DbModule, CoreModule, CategoriesModule, NewsModule],
+  imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    DbModule,
+    CoreModule,
+    CategoriesModule,
+    NewsModule,
+  ],
   providers: [
     {
       provide: APP_GUARD,
