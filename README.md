@@ -1,1 +1,1 @@
-# News app API
+# Brief me API
