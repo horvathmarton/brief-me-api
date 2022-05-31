@@ -33,11 +33,13 @@ export class CategoryPrioritiesService {
       throw new ConflictException('Priority already exists.');
     }
 
-    return getRepository(CategoryPriority).save({
+    const createdCategoryPriority = await getRepository(CategoryPriority).save({
       userId,
       categoryId: category.id,
       priority,
     });
+
+    return getRepository(CategoryPriority).create(createdCategoryPriority);
   }
 
   public async deletePriority(
@@ -63,7 +65,7 @@ export class CategoryPrioritiesService {
     await getRepository(CategoryPriority).remove(categoryPriority);
   }
 
-  public async export(): Promise<void> {
+  public async export(): Promise<string> {
     const priorities = await getRepository(CategoryPriority).find();
 
     const users = await getRepository(User).find();

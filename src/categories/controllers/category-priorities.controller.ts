@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Req,
+  StreamableFile,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { CategoryPriority } from 'src/db/models';
@@ -58,9 +59,9 @@ export class CategoryPrioritiesController {
 
   @Get('export')
   @Role('admin')
-  public async exportCategoryPrioritiesMatrix(): Promise<void> {
+  public async exportCategoryPrioritiesMatrix(): Promise<StreamableFile> {
     const csv = await this.categoryPrioritiesService.export();
 
-    return csv;
+    return new StreamableFile(Buffer.from(csv));
   }
 }

@@ -8,35 +8,36 @@ import {
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import { Role } from 'src/auth/roles';
+import { Channel } from 'src/shared/payloads';
+import { Article } from 'src/shared/payloads/article.response';
 import { ApiResponse } from '../shared/types';
-import { Article, Channel } from './interfaces';
 import { NewsService, TtsService } from './services';
 
 @Controller('news')
 export class NewsController {
+  private readonly CHANNELS = [
+    new Channel({
+      id: 1,
+      title: 'For me',
+      keywords: ['investing', 'engineering', 'software'],
+    }),
+    new Channel({
+      id: 2,
+      title: 'About the war',
+      keywords: ['Ukraine', 'war', 'Russia', 'Donbas'],
+    }),
+    new Channel({
+      id: 3,
+      title: 'US elections',
+      keywords: ['elections', 'politics', 'Joe Biden', 'Donald Trump'],
+    }),
+    new Channel({ id: 4, title: 'Celebrity news', keywords: ['celebrity'] }),
+  ];
+
   constructor(
     private readonly newsService: NewsService,
     private readonly ttsService: TtsService,
   ) {}
-
-  private readonly CHANNELS = [
-    {
-      id: 1,
-      title: 'For me',
-      keywords: ['investing', 'engineering', 'software'],
-    },
-    {
-      id: 2,
-      title: 'About the war',
-      keywords: ['Ukraine', 'war', 'Russia', 'Donbas'],
-    },
-    {
-      id: 3,
-      title: 'US elections',
-      keywords: ['elections', 'politics', 'Joe Biden', 'Donald Trump'],
-    },
-    { id: 4, title: 'Celebrity news', keywords: ['celebrity'] },
-  ];
 
   @Get('channels')
   @Role('user')

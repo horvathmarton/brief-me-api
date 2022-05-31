@@ -1,7 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import { firstValueFrom, pluck } from 'rxjs';
-import { Article, NewsListingPayload } from '../interfaces';
+import { firstValueFrom, map, pluck } from 'rxjs';
+import { Article } from '../../shared/payloads/article.response';
+import { NewsListingPayload } from '../interfaces';
 
 interface NewsApiResponse<T = unknown> {
   articles: {
@@ -39,7 +40,10 @@ export class NewsService {
           data: payload,
         },
       )
-      .pipe(pluck('data', 'articles', 'results'));
+      .pipe(
+        pluck('data', 'articles', 'results'),
+        map((articles) => articles.map((article) => new Article(article))),
+      );
 
     return firstValueFrom(request);
   }

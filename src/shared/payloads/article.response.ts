@@ -1,6 +1,14 @@
-import { NewsSource } from './news-source.interface';
+import { Exclude, Expose } from 'class-transformer';
+import { NewsSource } from '../../news/interfaces';
 
-export interface Article {
+@Exclude()
+export class Article {
+  @Expose()
+  title: string;
+
+  @Expose()
+  body: string;
+
   uri: string;
   lang: string;
   isDuplicate: boolean;
@@ -11,8 +19,6 @@ export interface Article {
   dataType: string;
   sim: number;
   url: string;
-  title: string;
-  body: string;
   source: NewsSource;
   authors: string[];
   image: string;
@@ -20,4 +26,8 @@ export interface Article {
   sentiment: number | null;
   wgt: number;
   relevance: number;
+
+  constructor(partial: Partial<Article>) {
+    Object.assign(this, partial);
+  }
 }

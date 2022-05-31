@@ -1,3 +1,4 @@
+import { Exclude, Expose } from 'class-transformer';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -11,17 +12,21 @@ import { Category } from './category.model';
 import { User } from './user.model';
 
 @Entity()
+@Exclude()
 export class CategoryPriority {
   @PrimaryGeneratedColumn()
   public id: number;
 
   @Column({ name: 'user__id' })
+  @Expose()
   public userId: number;
 
   @Column({ name: 'category__id' })
+  @Expose()
   public categoryId: number;
 
   @Column({ name: 'priority', type: 'int', nullable: false })
+  @Expose()
   public priority: number;
 
   @CreateDateColumn()

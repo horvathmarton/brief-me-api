@@ -6,16 +6,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { compareSync } from 'bcrypt';
-import { ApiResponse } from 'src/shared/types';
 import { getRepository } from 'typeorm';
 import { User } from '../db/models';
-import { LoginPayload } from '../shared/payloads';
+import { LoginPayload, TokenResponse } from '../shared/payloads';
+import { ApiResponse } from '../shared/types';
 import { AuthService } from './auth.service';
 import { Role } from './roles/roles.decorator';
-
-interface TokenResponse {
-  token: string;
-}
 
 @Controller('auth')
 export class AuthController {
@@ -42,7 +38,9 @@ export class AuthController {
     }
 
     return {
-      payload: { token: this.authService.createToken(username, user.isAdmin) },
+      payload: new TokenResponse({
+        token: this.authService.createToken(username, user.isAdmin),
+      }),
     };
   }
 }
