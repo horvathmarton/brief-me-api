@@ -1,4 +1,10 @@
-import { Controller, Get, Param, StreamableFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  StreamableFile,
+} from '@nestjs/common';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import { Role } from 'src/auth/roles';
@@ -13,27 +19,46 @@ export class NewsController {
     private readonly ttsService: TtsService,
   ) {}
 
+  private readonly CHANNELS = [
+    {
+      id: 1,
+      title: 'For me',
+      keywords: ['investing', 'engineering', 'software'],
+    },
+    {
+      id: 2,
+      title: 'About the war',
+      keywords: ['Ukraine', 'war', 'Russia', 'Donbas'],
+    },
+    {
+      id: 3,
+      title: 'US elections',
+      keywords: ['elections', 'politics', 'Joe Biden', 'Donald Trump'],
+    },
+    { id: 4, title: 'Celebrity news', keywords: ['celebrity'] },
+  ];
+
   @Get('channels')
   @Role('user')
   public listChannels(): ApiResponse<Channel[]> {
-    const CHANNELS = [
-      { id: 1, title: 'For me' },
-      { id: 2, title: 'About the war' },
-      { id: 3, title: 'US elections' },
-      { id: 4, title: 'Celebrity news' },
-    ];
-
-    return { payload: CHANNELS };
+    return { payload: this.CHANNELS };
   }
 
   @Get('channels/:channelId')
   @Role('user')
   public async fetchChannelVoice(
-    @Param('channelId') channelId: number,
+    @Param('channelId') channelId: string,
   ): Promise<StreamableFile> {
-    const news = await this.newsService.list(channelId);
+    const parsedChannelId = Number.parseInt(channelId);
+    const channel = this.CHANNELS.find((c) => c.id === parsedChannelId);
 
-    const filePath = await this.ttsService.toFile(news[0].content);
+    if (!channel) {
+      throw new NotFoundException("Channel with this ID doesn't exist.");
+    }
+
+    const news = await this.newsService.list(channel.keywords);
+
+    const filePath = await this.ttsService.toFile(news[0].body);
     const file = createReadStream(join(process.cwd(), filePath));
 
     return new StreamableFile(file);
@@ -42,9 +67,16 @@ export class NewsController {
   @Get('channels/:channelId/text')
   @Role('user')
   public async fetchChannelText(
-    @Param('channelId') channelId: number,
+    @Param('channelId') channelId: string,
   ): Promise<ApiResponse<Article[]>> {
-    const news = await this.newsService.list(channelId);
+    const parsedChannelId = Number.parseInt(channelId);
+    const channel = this.CHANNELS.find((c) => c.id === parsedChannelId);
+
+    if (!channel) {
+      throw new NotFoundException("Channel with this ID doesn't exist.");
+    }
+
+    const news = await this.newsService.list(channel.keywords);
 
     return { payload: news };
   }
