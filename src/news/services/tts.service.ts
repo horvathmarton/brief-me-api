@@ -1,23 +1,26 @@
 import { Injectable } from '@nestjs/common';
+import { writeFile } from 'fs';
+import { getAllAudioBase64 } from 'google-tts-api';
 import { join } from 'path';
-import say from 'say';
 import { generateRandomId } from 'src/shared/helpers';
 import { promisify } from 'util';
 
 @Injectable()
 export class TtsService {
-  private saySpeak = promisify(say.speak.bind(say));
-  private sayExport = promisify(say.export.bind(say));
-
-  public async say(text: string): Promise<void> {
-    return this.saySpeak(text, 'Alex', 0.75);
-  }
+  private asyncWriteFile = promisify(writeFile);
 
   public async toFile(text: string): Promise<string> {
     const filePath = join('tmp', `${generateRandomId(16)}.wav`);
 
-    await this.sayExport(text, 'Alex', 0.75, join(process.cwd(), filePath));
+    const speech = (
+      await getAllAudioBase64(text, {
+        lang: 'en',
+        slow: false,
+        host: 'https://translate.google.com',
+        timeout: 10_000,
+      })
+    ).reduce((concated, chunk) => concated + chunk.base64, '');
 
-    return filePath;
+    return this.asyncWriteFile(filePath, speech, 'base64').then(() => filePath);
   }
 }
