@@ -5,24 +5,37 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { compareSync } from 'bcrypt';
 import { getRepository } from 'typeorm';
 import { User } from '../db/models';
 import { LoginPayload, TokenResponse } from '../shared/payloads';
-import { ApiResponse } from '../shared/types';
+import { ApiResponsePayload } from '../shared/types';
 import { AuthService } from './auth.service';
 import { Role } from './roles/roles.decorator';
 
 @Controller({ path: 'auth', version: '1' })
+@ApiTags('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
   @Role('anonymous')
   @HttpCode(200)
+  @ApiOkResponse({
+    description: 'Logged in successfully.',
+    type: TokenResponse,
+  })
+  @ApiBadRequestResponse({ description: 'Malformed payload.' })
+  @ApiUnauthorizedResponse({ description: 'Invalid username or password.' })
   public async signIn(
     @Body() payload: LoginPayload,
-  ): Promise<ApiResponse<TokenResponse>> {
+  ): Promise<ApiResponsePayload<TokenResponse>> {
     const { username, password } = payload;
 
     const user = await getRepository(User).findOne({ username });

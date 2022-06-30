@@ -1,0 +1,193 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1/auth/login": {
+      "post": {
+        "operationId": "AuthController_signIn",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginPayload" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Logged in successfully." },
+          "400": { "description": "Malformed payload." },
+          "401": { "description": "Invalid username or password." }
+        },
+        "tags": ["auth"]
+      }
+    },
+    "/": {
+      "get": {
+        "operationId": "CoreController_healthCheck",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Instance is healthy." },
+          "500": { "description": "Instance is down." }
+        },
+        "tags": ["core"]
+      }
+    },
+    "/version": {
+      "get": {
+        "operationId": "CoreController_version",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "API version info fetched successfully." }
+        },
+        "tags": ["core"]
+      }
+    },
+    "/v1/category-priorities/{categoryName}": {
+      "post": {
+        "operationId": "CategoryPrioritiesController_addPriority",
+        "parameters": [
+          {
+            "name": "categoryName",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryPriorityPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Priority added successfully." },
+          "400": { "description": "Malformed payload." },
+          "401": { "description": "User is not authenticated." },
+          "404": { "description": "Category name not found." },
+          "409": {
+            "description": "Category priority already exists for this user."
+          }
+        },
+        "tags": ["categories"]
+      },
+      "delete": {
+        "operationId": "CategoryPrioritiesController_deletePriority",
+        "parameters": [
+          {
+            "name": "categoryName",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Priority deleted successfully." },
+          "401": { "description": "User is not authenticated." },
+          "404": { "description": "Category name not found." }
+        },
+        "tags": ["categories"]
+      }
+    },
+    "/v1/category-priorities/export": {
+      "get": {
+        "operationId": "CategoryPrioritiesController_exportCategoryPrioritiesMatrix",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Matrix exported successfully." },
+          "401": { "description": "User is not authenticated." },
+          "403": { "description": "User is not administrator." }
+        },
+        "tags": ["categories"]
+      }
+    },
+    "/v1/categories": {
+      "get": {
+        "operationId": "CategoriesController_listCategories",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Fetched category list successfully." },
+          "401": { "description": "User is not authenticated." }
+        },
+        "tags": ["categories"]
+      }
+    },
+    "/v1/news/channels": {
+      "get": {
+        "operationId": "NewsController_listChannels",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Fetched channel list successfully." },
+          "401": { "description": "User is not authenticated." }
+        },
+        "tags": ["channels"]
+      }
+    },
+    "/v1/news/channels/{channelId}": {
+      "get": {
+        "operationId": "NewsController_fetchChannelVoice",
+        "parameters": [
+          {
+            "name": "channelId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Download stream started." },
+          "401": { "description": "User is not authenticated." }
+        },
+        "tags": ["channels"]
+      }
+    },
+    "/v1/news/channels/{channelId}/text": {
+      "get": {
+        "operationId": "NewsController_fetchChannelText",
+        "parameters": [
+          {
+            "name": "channelId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Text channel fetched successfully." },
+          "401": { "description": "User is not authenticated." }
+        },
+        "tags": ["channels"]
+      }
+    }
+  },
+  "info": {
+    "title": "Brief me API",
+    "description": "API documentation for the Brief me app.",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "LoginPayload": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": ["username", "password"]
+      },
+      "CategoryPriorityPayload": {
+        "type": "object",
+        "properties": {
+          "priority": { "type": "number", "minimum": 0, "maximum": 10 }
+        },
+        "required": ["priority"]
+      }
+    }
+  }
+}

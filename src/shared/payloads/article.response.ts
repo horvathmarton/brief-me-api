@@ -1,12 +1,15 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { NewsSource } from '../../news/interfaces';
 
 @Exclude()
 export class Article {
   @Expose()
+  @ApiProperty()
   title: string;
 
   @Expose()
+  @ApiProperty()
   body: string;
 
   uri: string;

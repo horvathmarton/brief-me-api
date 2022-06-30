@@ -1,2 +1,2 @@
 export type Role = 'anonymous' | 'user' | 'admin';
-export type ApiResponse<T> = { payload: T };
+export type ApiResponsePayload<T> = { payload: T };

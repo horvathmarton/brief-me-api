@@ -5,15 +5,23 @@ import {
   Param,
   StreamableFile,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import { Role } from 'src/auth/roles';
 import { Channel } from 'src/shared/payloads';
 import { Article } from 'src/shared/payloads/article.response';
-import { ApiResponse } from '../shared/types';
+import { ApiResponsePayload } from '../shared/types';
 import { NewsService, TtsService } from './services';
 
 @Controller({ path: 'news', version: '1' })
+@ApiTags('channels')
+@ApiBearerAuth()
 export class NewsController {
   private readonly CHANNELS = [
     new Channel({
@@ -41,12 +49,19 @@ export class NewsController {
 
   @Get('channels')
   @Role('user')
-  public listChannels(): ApiResponse<Channel[]> {
+  @ApiOkResponse({
+    description: 'Fetched channel list successfully.',
+    type: [Channel],
+  })
+  @ApiUnauthorizedResponse({ description: 'User is not authenticated.' })
+  public listChannels(): ApiResponsePayload<Channel[]> {
     return { payload: this.CHANNELS };
   }
 
   @Get('channels/:channelId')
   @Role('user')
+  @ApiOkResponse({ description: 'Download stream started.' })
+  @ApiUnauthorizedResponse({ description: 'User is not authenticated.' })
   public async fetchChannelVoice(
     @Param('channelId') channelId: string,
   ): Promise<StreamableFile> {
@@ -67,9 +82,14 @@ export class NewsController {
 
   @Get('channels/:channelId/text')
   @Role('user')
+  @ApiOkResponse({
+    description: 'Text channel fetched successfully.',
+    type: [Article],
+  })
+  @ApiUnauthorizedResponse({ description: 'User is not authenticated.' })
   public async fetchChannelText(
     @Param('channelId') channelId: string,
-  ): Promise<ApiResponse<Article[]>> {
+  ): Promise<ApiResponsePayload<Article[]>> {
     const parsedChannelId = Number.parseInt(channelId);
     const channel = this.CHANNELS.find((c) => c.id === parsedChannelId);
 
