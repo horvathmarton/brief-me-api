@@ -25,6 +25,7 @@ import { Request } from 'express';
 import { CategoryPriority } from 'src/db/models';
 import { AuthService } from '../../auth/auth.service';
 import { Role } from '../../auth/roles';
+import { ChannelsService } from '../../news/services';
 import { CategoryPriorityPayload } from '../../shared/payloads';
 import { ApiResponsePayload } from '../../shared/types';
 import { CategoryPrioritiesService } from '../services';
@@ -36,6 +37,7 @@ export class CategoryPrioritiesController {
   constructor(
     private readonly authService: AuthService,
     private readonly categoryPrioritiesService: CategoryPrioritiesService,
+    private readonly channelsService: ChannelsService,
   ) {}
 
   @Post(':categoryName')
@@ -53,11 +55,12 @@ export class CategoryPrioritiesController {
     @Body() payload: CategoryPriorityPayload,
   ): Promise<ApiResponsePayload<CategoryPriority>> {
     const { priority } = payload;
-    const token = this.authService.parseToken(request);
-    const { username } = this.authService.decodeToken(token);
+    const userId = this.authService.getAuthenticatedUserId(request);
+
+    this.channelsService.invalidateCache(userId);
 
     const categoryPriority = await this.categoryPrioritiesService.addPriority(
-      username,
+      userId,
       categoryName,
       priority,
     );
@@ -75,10 +78,11 @@ export class CategoryPrioritiesController {
     @Req() request: Request,
     @Param('categoryName') categoryName: string,
   ): Promise<void> {
-    const token = this.authService.parseToken(request);
-    const { username } = this.authService.decodeToken(token);
+    const userId = this.authService.getAuthenticatedUserId(request);
 
-    await this.categoryPrioritiesService.deletePriority(username, categoryName);
+    this.channelsService.invalidateCache(userId);
+
+    await this.categoryPrioritiesService.deletePriority(userId, categoryName);
   }
 
   @Get('export')

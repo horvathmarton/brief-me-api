@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { writeFile } from 'fs';
 import { getAllAudioBase64 } from 'google-tts-api';
 import { join } from 'path';
-import { generateRandomId } from 'src/shared/helpers';
 import { promisify } from 'util';
+import { generateRandomId } from '../../shared/helpers';
 
 @Injectable()
 export class TtsService {

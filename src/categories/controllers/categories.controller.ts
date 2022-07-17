@@ -3,7 +3,7 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
+  ApiUnauthorizedResponse
 } from '@nestjs/swagger';
 import { Category } from 'src/db/models';
 import { ApiResponsePayload } from 'src/shared/types';
@@ -14,7 +14,7 @@ import { CategoriesService } from '../services';
 @ApiTags('categories')
 @ApiBearerAuth()
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(private readonly categoriesService: CategoriesService) { }
 
   @Get()
   @Role('user')

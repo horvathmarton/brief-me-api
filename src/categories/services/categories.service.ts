@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { getTreeRepository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { Category } from '../../db/models';
 
 @Injectable()
 export class CategoriesService {
+  constructor(private readonly dataSource: DataSource) { }
+
   public async list(): Promise<Category[]> {
-    return getTreeRepository(Category).findTrees({ depth: 3 });
+    return this.dataSource.getTreeRepository(Category).findTrees({ depth: 3 });
   }
 }

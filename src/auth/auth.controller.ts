@@ -12,7 +12,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { compareSync } from 'bcrypt';
-import { getRepository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { User } from '../db/models';
 import { LoginPayload, TokenResponse } from '../shared/payloads';
 import { ApiResponsePayload } from '../shared/types';
@@ -22,7 +22,10 @@ import { Role } from './roles/roles.decorator';
 @Controller({ path: 'auth', version: '1' })
 @ApiTags('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly dataSource: DataSource,
+  ) {}
 
   @Post('login')
   @Role('anonymous')
@@ -38,11 +41,11 @@ export class AuthController {
   ): Promise<ApiResponsePayload<TokenResponse>> {
     const { username, password } = payload;
 
-    const user = await getRepository(User).findOne({ username });
+    const user = await this.dataSource.getRepository(User).findOne({
+      where: { username },
+    });
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid username or password.');
-    }
+    if (!user) throw new UnauthorizedException('Invalid username or password.');
 
     const passwordCorrect = compareSync(password, user.passwordHash);
 
@@ -52,7 +55,7 @@ export class AuthController {
 
     return {
       payload: new TokenResponse({
-        token: this.authService.createToken(username, user.isAdmin),
+        token: this.authService.createToken(user.id, username, user.isAdmin),
       }),
     };
   }
