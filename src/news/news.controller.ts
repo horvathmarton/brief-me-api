@@ -99,7 +99,7 @@ export class NewsController {
 
     const news = await this.newsService.list(channel.keywords);
 
-    const filePath = await this.ttsService.toFile(news[0].body);
+    const filePath = await this.ttsService.toFile(news[0].description);
     const file = createReadStream(join(process.cwd(), filePath));
 
     return new StreamableFile(file);

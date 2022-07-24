@@ -1,47 +1,37 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
-import { firstValueFrom, map, pluck } from 'rxjs';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { firstValueFrom, map } from 'rxjs';
 import { Article } from '../../shared/payloads/article.response';
-import { NewsListingPayload } from '../interfaces';
 
 interface NewsApiResponse<T = unknown> {
-  articles: {
-    page: number;
-    totalResults: number;
-    pages: number;
-    results: T;
-  };
+  status: string;
+  totalResults: number;
+  articles: T;
 }
 
 @Injectable()
 export class NewsService {
-  constructor(private readonly http: HttpService) {}
+  constructor(
+    private readonly http: HttpService,
+    private readonly config: ConfigService,
+  ) {
+    if (!this.config.get('NEWS_API_KEY')) {
+      throw new InternalServerErrorException('NEWS_API_KEY is note defined.');
+    }
+  }
 
   public async list(keywords: string[]): Promise<Article[]> {
-    const payload: NewsListingPayload = {
-      action: 'getArticles',
-      keyword: keywords,
-      lang: 'eng',
-      articlesPage: 1,
-      articlesCount: 2,
-      articlesSortBy: 'date',
-      articlesSortByAsc: false,
-      articlesArticleBodyLen: -1,
-      resultType: 'articles',
-      dataType: ['news', 'pr'],
-      apiKey: process.env.NEWS_API_KEY,
-      forceMaxDataTimeWindow: 31,
-    };
+    const keywordList = keywords.join(' OR ');
+    const apiKey = this.config.get('NEWS_API_KEY');
+    const queryParams = `q=${keywordList}&apiKey=${apiKey}&language=en&sortBy=relevancy`;
 
     const request = this.http
       .get<NewsApiResponse<Article[]>>(
-        `https://eventregistry.org/api/v1/article/getArticles`,
-        {
-          data: payload,
-        },
+        `https://newsapi.org/v2/everything?${queryParams}`,
       )
       .pipe(
-        pluck('data', 'articles', 'results'),
+        map((response) => response?.data?.articles),
         map((articles) => articles.map((article) => new Article(article))),
       );
 

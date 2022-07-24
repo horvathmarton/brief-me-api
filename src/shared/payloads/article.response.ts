@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
-import { NewsSource } from '../../news/interfaces';
 
 @Exclude()
 export class Article {
@@ -10,25 +9,17 @@ export class Article {
 
   @Expose()
   @ApiProperty()
-  body: string;
+  description: string;
 
-  uri: string;
-  lang: string;
-  isDuplicate: boolean;
-  date: string;
-  time: string;
-  dateTime: Date;
-  dateTimePub: Date;
-  dataType: string;
-  sim: number;
+  source: {
+    id: string;
+    name: string;
+  };
+  author: string | null;
   url: string;
-  source: NewsSource;
-  authors: string[];
-  image: string;
-  eventUri: string | null;
-  sentiment: number | null;
-  wgt: number;
-  relevance: number;
+  urlToImage: string;
+  publishedAt: string;
+  content: string;
 
   constructor(partial: Partial<Article>) {
     Object.assign(this, partial);
